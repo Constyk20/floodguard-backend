@@ -1,0 +1,61 @@
+{
+  "version": "1.0.0",
+  "trainedAt": "2025-11-07T20:01:22.669Z",
+  "tensorflowVersion": "4.22.0",
+  "backend": "cpu",
+  "architecture": {
+    "inputShape": [
+      5
+    ],
+    "layers": [
+      "dense(32, relu, heNormal)",
+      "dropout(0.2)",
+      "dense(16, relu, heNormal)",
+      "dropout(0.1)",
+      "dense(8, relu)",
+      "dense(1, sigmoid)"
+    ]
+  },
+  "training": {
+    "epochs": 100,
+    "batchSize": 32,
+    "samples": 1000,
+    "optimizer": "adam(0.001)",
+    "loss": "meanSquaredError",
+    "finalLoss": 0.0044,
+    "finalValLoss": 0.0027,
+    "finalMae": 0.0521
+  },
+  "inputFeatures": [
+    {
+      "name": "rainfall",
+      "description": "Rainfall in mm (normalized by /50)",
+      "range": "0-60mm"
+    },
+    {
+      "name": "soilMoisture",
+      "description": "Soil moisture percentage",
+      "range": "0-1"
+    },
+    {
+      "name": "waterLevel",
+      "description": "Water level in meters (normalized by /6)",
+      "range": "0-6m"
+    },
+    {
+      "name": "feature4",
+      "description": "Placeholder feature",
+      "range": "0-0.1"
+    },
+    {
+      "name": "feature5",
+      "description": "Placeholder feature",
+      "range": "0-0.1"
+    }
+  ],
+  "output": {
+    "name": "floodRisk",
+    "description": "Probability of flood occurrence",
+    "range": "0-1 (multiply by 100 for percentage)"
+  }
+}
