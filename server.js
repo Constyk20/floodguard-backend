@@ -53,11 +53,24 @@ const floodSchema = new mongoose.Schema({
 const FloodData = mongoose.model('FloodData', floodSchema);
 
 // ======================
-// 4. Firebase Admin
+// 4. Firebase Admin (Production-ready)
 // ======================
 let firebaseInitialized = false;
 try {
-  const serviceAccount = require('./firebase-service-account.json');
+  let serviceAccount;
+  
+  if (process.env.FIREBASE_CONFIG_BASE64) {
+    // Method B: Base64 encoded
+    const decoded = Buffer.from(process.env.FIREBASE_CONFIG_BASE64, 'base64').toString('utf8');
+    serviceAccount = JSON.parse(decoded);
+  } else if (process.env.FIREBASE_CONFIG) {
+    // Method A: Direct JSON
+    serviceAccount = JSON.parse(process.env.FIREBASE_CONFIG);
+  } else {
+    // Development: Load from file
+    serviceAccount = require('./firebase-service-account.json');
+  }
+  
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
   });
