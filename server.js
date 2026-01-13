@@ -18,6 +18,7 @@ const io = socketIo(server, {
   cors: { origin: "*" }
 });
 
+// Middleware
 app.use(express.json());
 
 // ======================
@@ -31,7 +32,13 @@ mongoose.connect(process.env.MONGO_URI)
   });
 
 // ======================
-// 3. Mongoose Schema
+// 3. User Routes Import
+// ======================
+const userRoutes = require('./routes/userRoutes');
+app.use('/api/users', userRoutes);
+
+// ======================
+// 4. Flood Data Schema (Existing)
 // ======================
 const floodSchema = new mongoose.Schema({
   timestamp: { type: Date, default: Date.now },
@@ -53,7 +60,7 @@ const floodSchema = new mongoose.Schema({
 const FloodData = mongoose.model('FloodData', floodSchema);
 
 // ======================
-// 4. Firebase Admin (Production-ready)
+// 5. Firebase Admin (Production-ready)
 // ======================
 let firebaseInitialized = false;
 try {
@@ -81,7 +88,7 @@ try {
 }
 
 // ======================
-// 5. AI MODEL LOADING (Fixed)
+// 6. AI MODEL LOADING (Fixed)
 // ======================
 let model = null;
 let modelLoadAttempted = false;
@@ -243,7 +250,7 @@ async function predictFloodRisk(rainfall, waterLevel, soilMoisture) {
 }
 
 // ======================
-// 6. Send FCM Alert
+// 7. Send FCM Alert
 // ======================
 async function sendFloodAlert(data) {
   if (!firebaseInitialized || data.sentAlert) return;
@@ -273,7 +280,7 @@ async function sendFloodAlert(data) {
 }
 
 // ======================
-// 7. Data Fetching Functions
+// 8. Data Fetching Functions
 // ======================
 async function fetchRainfallData(lat, lng) {
   try {
@@ -331,7 +338,7 @@ async function fetchSoilMoisture(lat, lng) {
 }
 
 // ======================
-// 8. Main Data Ingestion (Every 10 mins)
+// 9. Main Data Ingestion (Every 10 mins)
 // ======================
 cron.schedule('*/10 * * * *', async () => {
   console.log('\n' + '='.repeat(50));
@@ -395,7 +402,7 @@ cron.schedule('*/10 * * * *', async () => {
 });
 
 // ======================
-// 9. Socket.io Connection
+// 10. Socket.io Connection
 // ======================
 io.on('connection', (socket) => {
   console.log('🔌 Client connected:', socket.id);
@@ -416,7 +423,7 @@ io.on('connection', (socket) => {
 });
 
 // ======================
-// 10. REST API Endpoints
+// 11. REST API Endpoints
 // ======================
 
 // Get latest flood data
@@ -480,7 +487,7 @@ app.post('/api/trigger', async (req, res) => {
 });
 
 // ======================
-// 11. Enhanced Dashboard
+// 12. Enhanced Dashboard
 // ======================
 app.get('/', (req, res) => {
   res.send(`
@@ -656,7 +663,7 @@ app.get('/', (req, res) => {
 });
 
 // ======================
-// 12. Start Server
+// 13. Start Server
 // ======================
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
@@ -666,6 +673,7 @@ server.listen(PORT, () => {
   console.log(`📍 Server: http://localhost:${PORT}`);
   console.log(`📊 Dashboard: http://localhost:${PORT}`);
   console.log(`🔌 WebSocket: ws://localhost:${PORT}`);
+  console.log(`👤 User API: http://localhost:${PORT}/api/users`);
   console.log('='.repeat(50) + '\n');
   
   // Load model on startup
