@@ -1,37 +1,28 @@
 /**
  * Flood Routes
  *
- * Purpose: API endpoints for flood prediction data
- *
- * Routes:
- * - GET  /api/flood/latest      - Get latest prediction
- * - GET  /api/flood/history     - Get historical data (paginated)
- * - GET  /api/flood/stats       - Get statistics summary
- * - GET  /api/flood/alerts      - Get recent high-risk alerts
- * - POST /api/flood/trigger     - Manually trigger data fetch
+ * Mount in routes/index.js:  router.use('/flood', require('./floodRoutes'));
+ * (Merge with your existing flood routes file if it has extra routes.)
  */
 
 const express = require('express');
+const floodController = require('../controllers/floodController');
+
 const router = express.Router();
-const {
-  getLatest,
-  getHistory,
-  getStats,
-  getAlerts,
-  triggerIngestion,
-  getStates,
-  refreshState
-} = require('../controllers/floodController');
 
-// Public routes
-router.get('/states', getStates);
-router.get('/latest', getLatest);            // also accepts ?state=kano
-router.get('/history', getHistory);          // also accepts ?state=kano
-router.post('/states/:state/refresh',refreshState);
-router.get('/stats', getStats);
-router.get('/alerts',getAlerts);
+// Whole-country / optional ?state=<slug>
+router.get('/latest', floodController.getLatest);
+router.get('/history', floodController.getHistory);
+router.get('/stats', floodController.getStats);
+router.get('/alerts', floodController.getAlerts);
 
-// Manual trigger (consider protecting this in production)
-router.post('/trigger', triggerIngestion);
+// State-based (frontend: user taps a state)
+router.get('/states', floodController.getStates);                       // all 37 + latest risk
+router.get('/states/:state', floodController.getLatest);                // latest for one state
+router.get('/states/:state/history', floodController.getHistory);       // history for one state
+router.post('/states/:state/refresh', floodController.refreshState);    // fetch fresh data now
+
+// Manual trigger for all states
+router.post('/trigger', floodController.triggerIngestion);
 
 module.exports = router;
