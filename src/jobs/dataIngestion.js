@@ -36,16 +36,17 @@ let isRunning = false;
  * Fetches data, predicts and stores a record for ONE state
  * @param {Object} state - entry from config/states.js
  * @param {Object} [io] - Socket.io instance
+ * @param {{force?: boolean}} [options] - force: bypass service caches (manual refresh)
  * @returns {Promise<Object>} saved record (plain object)
  */
-const ingestForLocation = async (state, io) => {
+const ingestForLocation = async (state, io, { force = false } = {}) => {
   const { lat, lng, name, slug } = state;
   console.log(`\n📍 ${name} (${lat}, ${lng})`);
 
   const [rainfallData, waterLevelData, soilMoistureData] = await Promise.all([
     fetchRainfall(lat, lng),
-    fetchWaterLevel(lat, lng),
-    fetchSoilMoisture(lat, lng)
+    fetchWaterLevel(lat, lng, { force }),
+    fetchSoilMoisture(lat, lng, { force })
   ]);
 
   const riskPercent = await predictFloodRisk(

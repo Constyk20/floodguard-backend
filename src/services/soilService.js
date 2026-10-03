@@ -31,12 +31,13 @@ const cacheKey = (lat, lng) => `${lat.toFixed(3)},${lng.toFixed(3)}`;
  * Fetches soil moisture
  * @param {number} lat - Latitude
  * @param {number} lng - Longitude
+ * @param {{force?: boolean}} [options] - force: skip the cache and call the API
  * @returns {Promise<{value: number, source: string, depth?: string}>}
  */
-const fetchSoilMoisture = async (lat, lng) => {
+const fetchSoilMoisture = async (lat, lng, { force = false } = {}) => {
   const key = cacheKey(lat, lng);
   const hit = cache.get(key);
-  if (hit && hit.expires > Date.now()) return hit.data;
+  if (!force && hit && hit.expires > Date.now()) return hit.data;
 
   try {
     const url =

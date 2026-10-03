@@ -72,7 +72,8 @@ module.exports = {
    */
   INGESTION: {
     DELAY_BETWEEN_STATES_MS: parseInt(process.env.STATE_DELAY_MS) || 1000,
-    REFRESH_COOLDOWN_MS: 2 * 60 * 1000  // min age before a manual state refresh re-fetches
+    REFRESH_COOLDOWN_MS: 2 * 60 * 1000,        // normal refresh: reuse a record younger than this
+    FORCE_REFRESH_MIN_INTERVAL_MS: 15 * 1000   // refresh button (?force=true): anti-spam minimum
   },
 
   /**

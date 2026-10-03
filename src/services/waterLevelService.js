@@ -50,12 +50,13 @@ const normalizeDischarge = (discharge) => {
  * Fetches river discharge from Open-Meteo Flood API (GloFAS)
  * @param {number} lat - Latitude
  * @param {number} lng - Longitude
+ * @param {{force?: boolean}} [options] - force: skip the cache and call the API
  * @returns {Promise<{value: number, source: string, raw?: number, unit?: string}>}
  */
-const fetchWaterLevel = async (lat, lng) => {
+const fetchWaterLevel = async (lat, lng, { force = false } = {}) => {
   const key = cacheKey(lat, lng);
   const hit = cache.get(key);
-  if (hit && hit.expires > Date.now()) return hit.data;
+  if (!force && hit && hit.expires > Date.now()) return hit.data;
 
   try {
     const response = await axios.get(FLOOD_API_URL, {
